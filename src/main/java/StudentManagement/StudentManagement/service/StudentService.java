@@ -3,6 +3,7 @@ package StudentManagement.StudentManagement.service;
 import StudentManagement.StudentManagement.dto.StudentRegistrationDto;
 import StudentManagement.StudentManagement.dto.StudentRegistrationResponseDto;
 import StudentManagement.StudentManagement.entity.Student;
+import StudentManagement.StudentManagement.exception.UserAlreadyExistException;
 import StudentManagement.StudentManagement.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,8 @@ public class StudentService {
              studentNew = studentRepository.save(studentNew);
              return new StudentRegistrationResponseDto(studentNew.getId(),
                      studentNew.getName(), "User successfully register");
+         }else{
+              throw  new UserAlreadyExistException();
          }
-         return null;
     }
 }

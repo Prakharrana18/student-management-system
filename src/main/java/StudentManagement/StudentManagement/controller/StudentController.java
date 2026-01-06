@@ -4,6 +4,7 @@ import StudentManagement.StudentManagement.dto.StudentRegistrationDto;
 import StudentManagement.StudentManagement.dto.StudentRegistrationResponseDto;
 import StudentManagement.StudentManagement.entity.Student;
 import StudentManagement.StudentManagement.service.StudentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class StudentController {
     @Autowired
     StudentService studentService;
     @PostMapping("/register")
-    public ResponseEntity<StudentRegistrationResponseDto> registerStudent(@RequestBody StudentRegistrationDto studentRegistrationDto){
+    public ResponseEntity<StudentRegistrationResponseDto> registerStudent(@Valid @RequestBody StudentRegistrationDto studentRegistrationDto){
 
         return ResponseEntity.ok(studentService.registerStudent(studentRegistrationDto));
     }
