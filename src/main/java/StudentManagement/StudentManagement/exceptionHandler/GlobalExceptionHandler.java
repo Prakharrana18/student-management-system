@@ -1,6 +1,7 @@
 package StudentManagement.StudentManagement.exceptionHandler;
 
 import StudentManagement.StudentManagement.exception.UserAlreadyExistException;
+import StudentManagement.StudentManagement.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,11 @@ public class GlobalExceptionHandler {
                 .forEach(error->
                         errors.put(error.getField(),error.getDefaultMessage()));
     return new ResponseEntity<>(errors,HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiException>handleUserNotFoundException(UserNotFoundException ex){
+        ApiException apiException= new ApiException(HttpStatus.NOT_FOUND,ex.getMessage());
+        return new ResponseEntity<>(apiException,HttpStatus.NOT_FOUND);
     }
 
 }
