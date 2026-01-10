@@ -55,20 +55,22 @@ public class StudentService {
         return studentRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
     }
 
-    public String studentPut(long id, StudentPutDto studentPutDto) {
-        Student student = studentRepository.findById(id).orElse(null);
-        if (student != null) {
-            student.setAge(studentPutDto.getAge());
-            student.setEmail(studentPutDto.getEmail());
-            student.setName(studentPutDto.getName());
-            studentRepository.save(student);
-        } else {
-            throw new UserNotFoundException();
+    public StudentResponseDto studentPut(long id, StudentPutDto studentPutDto) {
+        Student student = studentRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        try {
+
+                student.setAge(studentPutDto.getAge());
+                student.setEmail(studentPutDto.getEmail());
+                student.setName(studentPutDto.getName());
+                studentRepository.save(student);
+
+        }catch (Exception ex){
+            throw  new UserNotFoundException();
         }
-        return "User Updated with put";
+        return mapToResponseDto(student);
     }
 
-    public String studentPatch(long id, StudentPatchDto studentPatchDto) {
+    public StudentResponseDto studentPatch(long id, StudentPatchDto studentPatchDto) {
         Student student = studentRepository.findById(id).orElse(null);
         if (student != null) {
             if (studentPatchDto.getAge() != null && studentPatchDto.getAge() >= 5) {
@@ -84,7 +86,7 @@ public class StudentService {
         } else {
             throw new UserNotFoundException();
         }
-        return "User Updated with patch";
+        return mapToResponseDto(student);
     }
 
     private StudentResponseDto mapToResponseDto(Student student) {

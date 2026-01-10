@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StudentResponseDto {
 
+
     long id;
     String name;
     String email;
