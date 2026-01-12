@@ -67,5 +67,9 @@ public class StudentController {
     public ResponseEntity<ApiResponse<StudentResponseDto>> studentPatch(@PathVariable long id, @RequestBody StudentPatchDto studentPatchDto){
         return ResponseEntity.ok(ApiResponse.success(studentService.studentPatch(id,studentPatchDto)));
     }
+    @DeleteMapping("/student/{id}")
+    public ResponseEntity<ApiResponse<InactiveStudentDtoResponse>> deleteStudent(@PathVariable long id){
+        return ResponseEntity.ok(ApiResponse.success(studentService.deleteStudent(id)));
+    }
 
 }

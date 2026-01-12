@@ -5,6 +5,7 @@ import StudentManagement.StudentManagement.entity.Student;
 import StudentManagement.StudentManagement.exception.UserAlreadyExistException;
 import StudentManagement.StudentManagement.exception.UserNotFoundException;
 import StudentManagement.StudentManagement.repository.StudentRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ public class StudentService {
                     .email(newStudent.getEmail())
                     .age(newStudent.getAge())
                     .name(newStudent.getName())
+                    .active(true)
                     .build();
             studentNew = studentRepository.save(studentNew);
             return new StudentRegistrationResponseDto(studentNew.getId(),
@@ -39,7 +41,7 @@ public class StudentService {
     }
 
     public PageResponse<StudentResponseDto> getAllStudents(Pageable pageable) {
-        Page<Student> studentPage=studentRepository.findAll(pageable);
+        Page<Student> studentPage=studentRepository.findAllActiveStudent(pageable);
         List<StudentResponseDto>students=studentPage.getContent().stream()
                 .map(this::mapToResponseDto).toList();
         return new PageResponse<>(
@@ -55,6 +57,7 @@ public class StudentService {
         return studentRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
     }
 
+    @Transactional
     public StudentResponseDto studentPut(long id, StudentPutDto studentPutDto) {
         Student student = studentRepository.findById(id).orElseThrow(UserNotFoundException::new);
         try {
@@ -70,6 +73,7 @@ public class StudentService {
         return mapToResponseDto(student);
     }
 
+    @Transactional
     public StudentResponseDto studentPatch(long id, StudentPatchDto studentPatchDto) {
         Student student = studentRepository.findById(id).orElse(null);
         if (student != null) {
@@ -89,12 +93,23 @@ public class StudentService {
         return mapToResponseDto(student);
     }
 
+    @Transactional
+    public InactiveStudentDtoResponse deleteStudent(long id){
+        Student student= studentRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        if(Boolean.FALSE.equals(student.getActive())){
+            return  new InactiveStudentDtoResponse("User already Deleted");
+        }
+       student.setActive(false);
+       studentRepository.save(student);
+    return  new InactiveStudentDtoResponse("Student Deleted Successfully");
+    }
     private StudentResponseDto mapToResponseDto(Student student) {
         return StudentResponseDto.builder()
                 .id(student.getId())
                 .name(student.getName())
                 .email(student.getEmail())
                 .age(student.getAge())
+                .status(student.getActive()?"Active":"Inactive")
                 .build();
     }
 }

@@ -27,10 +27,14 @@ public class Student {
 
     @Email
     private String email;
-    @Min(value = 5)
+    @Min(5)
     private int age;
 
     private String course;
+
+    @Column(nullable = false)
+    private Boolean active=true;
+
 
     @CreationTimestamp
     LocalDateTime createAt;

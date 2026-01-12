@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,21 +19,29 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(UserAlreadyExistException.class)
-    public ResponseEntity<ApiException>handleUserAlreadyExist(UserAlreadyExistException ex, HttpServletRequest httpRequest){
-       ApiException apiException= new ApiException(HttpStatus.CONFLICT,ex.getMessage());
+    public ResponseEntity<ErrorResponse>handleUserAlreadyExist(UserAlreadyExistException ex, HttpServletRequest httpRequest){
+        ErrorResponse apiException=ErrorResponse.builder()
+               .success(false)
+               .errorCode("USER_ALREADY_EXIST")
+               .message(ex.getMessage())
+               .build();
         return  new ResponseEntity<>(apiException,HttpStatus.CONFLICT);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String,String>>handleMethodArgumentNotValid(MethodArgumentNotValidException ex){
-        Map<String,String>errors= new HashMap<>();
+    public ResponseEntity<ErrorResponse>handleMethodArgumentNotValid(MethodArgumentNotValidException ex){
+        String message=
         ex.getBindingResult().getFieldErrors()
-                .forEach(error->
-                        errors.put(error.getField(),error.getDefaultMessage()));
-    return new ResponseEntity<>(errors,HttpStatus.BAD_REQUEST);
+                .stream().map(error->
+                        error.getField()+ " "+ error.getDefaultMessage()).findFirst().orElse("Validation failed");
+    return ResponseEntity.badRequest().body(ErrorResponse.builder().success(false).
+            errorCode("VALIDATION_ERROR").message(message).localDateTime(LocalDateTime.now()).build());
     }
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ApiException>handleUserNotFoundException(UserNotFoundException ex){
-        ApiException apiException= new ApiException(HttpStatus.NOT_FOUND,ex.getMessage());
+    public ResponseEntity<ErrorResponse>handleUserNotFoundException(UserNotFoundException ex){
+        ErrorResponse apiException= ErrorResponse.builder()
+                .success(false)
+                .errorCode("STUDENT_NOT_FOUND")
+                .message(ex.getMessage()).build();
         return new ResponseEntity<>(apiException,HttpStatus.NOT_FOUND);
     }
 

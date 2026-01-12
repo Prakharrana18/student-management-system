@@ -12,8 +12,9 @@ import lombok.NoArgsConstructor;
 public class StudentResponseDto {
 
 
-    long id;
+    Long id;
     String name;
     String email;
-    int age;
+    Integer age;
+     String status;
 }
