@@ -5,3 +5,5 @@
 .project
 .settings
 .env
+# Ignore sensitive Spring Boot config
+/src/main/resources/application.properties
