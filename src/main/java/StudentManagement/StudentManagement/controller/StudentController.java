@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("")
 public class StudentController {
 
     @Autowired
