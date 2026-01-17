@@ -2,22 +2,32 @@ package StudentManagement.StudentManagement.exceptionHandler;
 
 import StudentManagement.StudentManagement.exception.UserAlreadyExistException;
 import StudentManagement.StudentManagement.exception.UserNotFoundException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse>handleAccessDeniedException(AccessDeniedException ex){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorResponse.builder().
+                errorCode("ACCESS_DENIED").message("Access Denied").build());
+    }
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse>handleAuthenticationException(AuthenticationException ex){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.builder().
+                errorCode("UNAUTHORIZED_USER").message("Unauthorized").build());
+    }
     @ExceptionHandler(UserAlreadyExistException.class)
     public ResponseEntity<ErrorResponse>handleUserAlreadyExist(UserAlreadyExistException ex, HttpServletRequest httpRequest){
         ErrorResponse apiException=ErrorResponse.builder()
@@ -43,6 +53,15 @@ public class GlobalExceptionHandler {
                 .errorCode("STUDENT_NOT_FOUND")
                 .message(ex.getMessage()).build();
         return new ResponseEntity<>(apiException,HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ErrorResponse> handleJwt(
+            JwtException ex) {
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.builder().errorCode("INVALID_JWT").
+                        message("Invalid Jwt token").
+                        success(false).build());
     }
 
 }

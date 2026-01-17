@@ -27,11 +27,27 @@ public class ApplicationSecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**", "/public/**").permitAll()
-                        .anyRequest().authenticated()).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(exceptionHandlingConfigurer ->
-                        exceptionHandlingConfigurer.accessDeniedHandler((request, response, accessDeniedException) -> {
-                            handlerExceptionResolver.resolveException(request, response, null, accessDeniedException);
-                        }));
+                        .requestMatchers("/getAll").hasRole("ADMIN")
+                        .requestMatchers("/students/*").hasAnyRole("ADMIN","STUDENT")
+                        .anyRequest().authenticated())
+                        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            handlerExceptionResolver.resolveException(
+                                    request, response, null, authException
+                                    );
+                            return;
+                        })
+                                .accessDeniedHandler(((request, response, accessDeniedException) ->
+                                {
+                                    handlerExceptionResolver.resolveException(request,response,null,accessDeniedException);
+                                    return;
+                                })
+
+                                )
+
+
+                )
         ;
         return httpSecurity.build();
     }
